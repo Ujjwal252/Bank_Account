@@ -26,25 +26,25 @@ To build an object-oriented, clean-coded banking simulation (Part A) paired with
 ## Concepts Demonstrated
 
 
-| :--- | :--- |
-| **Comprehensions** | `transaction_analysis.py`: Extracts specific deposit lists (List); Maps grouped accounts to Series dicts (Dict). |
-| **lambda** | `transaction_analysis.py`: Inline predicates checking transaction keys (`x["TransactionType"] == ...`) and mapping formatter strings. |
-| **map** | `transaction_analysis.py`: Applies string interpolation across a filtered list of large accounts. |
-| **filter** | `transaction_analysis.py`: Sifts `dict` records extracting only "Withdrawal"s or values > 5000 natively. |
-| **OOP** | `bank_account.py`: Classes, attributes, and methods in `BankAccount`. Defines `__init__`, encapsulate state (`_transactions`). |
-| **Inheritance** | `bank_account.py`: `SavingsAccount(BankAccount)` inherits standard logic but introduces a `minimum_balance`. |
-| **Polymorphism** | `bank_account.py`: `SavingsAccount.withdraw()` overwrites parent generic logic enforcing distinct minimum balance rules. |
-| **Decorators** | `decorators.py`: `@log_transaction` adorns class operations tracing function start, argument extraction `*args, **kwargs`, and re-raising of errors securely. Uses `functools.wraps`. |
-| **Context Managers** | `transaction_logger.py`: `TransactionLogger` natively secures append bindings to `.txt` files in `__enter__` and strictly closes streams regardless of exceptions in `__exit__`. |
-| **pandas** | `transaction_analysis.py`: Uses `pd.read_csv` (loads assets), `df.groupby(...).agg(...)` (calculates user dimensions), and `pd.merge` (joins ledger types). |
-| **NumPy** | `transaction_analysis.py`: Harnesses `np.sum()`, `np.mean()`, `np.max()`, and `np.min()` operating strictly over localized `amount` arrays. |
-| **Modules** | General: Imports separated intelligently. Features abstracted loosely (e.g. `main.py` explicitly loads exactly what it orchestrates). |
-| **Packages** | `src/`: Organizes hierarchical folders containing `__init__.py` making imports clean (`src.models.bank_account`, `src.analysis.transaction_analysis`). |
-| **Virtual Environment** | Environmentally walled project. See Installation. Excluded entirely from `git` via `.gitignore`. |
-| **Clean Code** | PEP8 consistency, docstrings, modular isolation of print routines to `main.py` freeing functional bounds to return structures natively. |
-| **Exception Design** | Employs Python native `ValueError` across business boundaries ensuring robust cascading behavior while trapping IO operations effectively (e.g. `FileNotFoundError`). Never swallows. |
+## 📚 Python Concepts Covered
 
----
+| Concept | Implementation |
+|---|---|
+| **Comprehensions** | List and dictionary comprehensions |
+| **Lambda** | Inline functions for filtering and formatting |
+| **map()** | Applies functions to transaction records |
+| **filter()** | Filters records based on conditions |
+| **OOP** | `BankAccount` class, attributes, and methods |
+| **Inheritance** | `SavingsAccount` extends `BankAccount` |
+| **Polymorphism** | Overridden `withdraw()` method |
+| **Decorators** | `@log_transaction` for transaction logging |
+| **Context Managers** | `TransactionLogger` for safe file handling |
+| **pandas** | CSV loading, filtering, `groupby()`, `merge()` |
+| **NumPy** | Transaction statistics and calculations |
+| **Modules & Packages** | Structured Python project organization |
+| **Virtual Environment** | Isolated project environment using `venv` |
+| **Exception Handling** | Validation and file-related errors |
+| **Clean Code** | Modular, readable, and maintainable structure |
 
 ## Project Structure
 
