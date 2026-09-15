@@ -1,0 +1,3 @@
+--- Session started for Arjun Sharma (ACC1001) ---
+Placed deposit of ₹2000. New balance: ₹7000.00
+Placed withdrawal of ₹1500. New balance: ₹5500.00

@@ -1,6 +1,6 @@
 # Bank Account Management & Transaction Analysis
 
-> **Status: 🚧 In Progress — DataGrokr PLP Week 2 Mini-Project | Phase 3 Complete**
+> **Status: 🚧 In Progress — DataGrokr PLP Week 2 Mini-Project | Phase 4 Complete**
 
 ---
 
@@ -52,8 +52,8 @@ It is built **phase by phase**, with each phase adding new features that corresp
 - 🔜 Inheritance and Polymorphism (planned)
 - 🔜 List comprehensions and dictionary comprehensions (planned)
 - 🔜 `lambda`, `map()`, `filter()` (planned)
-- 🔜 Decorators (planned)
-- 🔜 Context managers (planned)
+- ✅ Decorators (`@log_transaction` on `BankAccount` routines)
+- ✅ Context managers (`TransactionLogger` for automated file closure)
 
 ---
 
@@ -74,8 +74,10 @@ Bank_Account/
 │   │   ├── __init__.py
 │   │   └── bank_account.py ← ✅ BankAccount class (Phase 2)
 │   │
-│   ├── services/           ← Application/business logic (planned)
-│   │   └── __init__.py
+│   ├── services/           
+│   │   ├── __init__.py
+│   │   ├── decorators.py       ← ✅ @log_transaction (Phase 4)
+│   │   └── transaction_logger.py ← ✅ Context Manager (Phase 4)
 │   │
 │   ├── analysis/           ← pandas/NumPy analysis (planned)
 │   │   └── __init__.py
@@ -141,7 +143,7 @@ pip install -r requirements.txt
 | Phase 1 | Project initialization & structure | ✅ Complete |
 | Phase 2 | BankAccount OOP implementation | ✅ Complete |
 | Phase 3 | pandas/NumPy Transaction Analysis | ✅ Complete |
-| Phase 4 | Advanced features (decorators, context managers) | 🔜 Planned |
+| Phase 4 | Advanced features (decorators, context managers) | ✅ Complete |
 | Phase 5 | Testing & final cleanup | 🔜 Planned |
 
 ---
@@ -268,6 +270,26 @@ A full unittest suite covers the analysis module:
 - Asserts that filters produce correct data constraints.
 - Verifies that `groupby` correctly computes expected bounds (e.g. `ACC1001` equals expected sum).
 - Validates the dimensions and columns of the output `merge`.
+
+---
+
+## Phase 4 — Decorators and Context Managers
+
+### Decorator (`src/services/decorators.py`)
+
+A custom Python decorator `@log_transaction` is implemented to automatically hook into standard `BankAccount` operations without polluting core domain logic with print statements.
+
+- **Why it is used**: Cleanly intercepts method calls like `deposit()` and `withdraw()` to emit logging events prior to execution and after successful resolution. It seamlessly passes arguments (`*args, **kwargs`) forward.
+- **Exceptions**: If the inner function fails (e.g., `ValueError` due to exceeding balance), the decorator catches the error, logs it as a failure, and then carefully **re-raises** it so it is not swallowed.
+- **Metadata**: Utilizes built-in `functools.wraps` ensuring `deposit.__name__` and `deposit.__doc__` are fully preserved.
+
+### Context Manager (`src/services/transaction_logger.py`)
+
+A custom class-based context manager `TransactionLogger` explicitly handles IO-blocks related to journaling transactions.
+
+- **Why it is used**: Automatically manages opening and closing `data/app_transaction_log.txt`. 
+- **`__enter__`**: Provisions requisite directories and securely opens the append-only log file stream.
+- **`__exit__`**: Intercepts block departure (whether normal or due to an exception like `ValueError`) and issues a deterministic `.close()` on the file, preventing resource leaks. Exiting returns `False` properly allowing arbitrary exceptions within `__exit__` to bubble outwards.
 
 ---
 

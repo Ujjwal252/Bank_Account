@@ -2,8 +2,10 @@
 bank_account.py
 
 BankAccount class — core OOP model for the Bank Account Management System.
-DataGrokr PLP Week 2 Mini-Project | Phase 2
+DataGrokr PLP Week 2 Mini-Project | Phase 2 & 4
 """
+
+from src.services.decorators import log_transaction
 
 
 class BankAccount:
@@ -59,6 +61,7 @@ class BankAccount:
     # Deposit
     # ------------------------------------------------------------------ #
 
+    @log_transaction
     def deposit(self, amount: float) -> None:
         """
         Deposit money into the account.
@@ -83,6 +86,7 @@ class BankAccount:
     # Withdraw
     # ------------------------------------------------------------------ #
 
+    @log_transaction
     def withdraw(self, amount: float) -> None:
         """
         Withdraw money from the account.

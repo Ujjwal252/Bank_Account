@@ -11,6 +11,7 @@ Run from project root:
 import os
 from src.models.bank_account import BankAccount
 from src.analysis.transaction_analysis import analyze_transactions
+from src.services.transaction_logger import TransactionLogger
 
 
 def print_transaction_history(account: BankAccount) -> None:
@@ -40,19 +41,28 @@ def main() -> None:
     print("\n[1] Creating account for Arjun Sharma with ₹5,000 initial balance...")
     account = BankAccount("Arjun Sharma", 5000.0)
     account.display_account()
+    
+    # ── Using the Context Manager to log transactions ─────────────────
+    log_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "app_transaction_log.txt")
+    print(f"\n[2] Performing transactions inside the TransactionLogger (writing to {log_path[-25:]})...")
+    
+    with TransactionLogger(log_path) as logger:
+        logger.log(f"--- Session started for {account.account_holder} ({account.account_number}) ---")
+        
+        # ── 3. Perform a valid deposit ────────────────────────────────────
+        print("\n[3] Depositing ₹2,000...")
+        account.deposit(2000.0)
+        logger.log(f"Placed deposit of ₹2000. New balance: ₹{account.get_balance():.2f}")
+        print(f"    ✓ Deposit successful. New balance: ₹{account.get_balance():.2f}")
 
-    # ── 2. Perform a valid deposit ────────────────────────────────────
-    print("\n[2] Depositing ₹2,000...")
-    account.deposit(2000.0)
-    print(f"    ✓ Deposit successful. New balance: ₹{account.get_balance():.2f}")
-
-    # ── 3. Perform a valid withdrawal ─────────────────────────────────
-    print("\n[3] Withdrawing ₹1,500...")
-    account.withdraw(1500.0)
-    print(f"    ✓ Withdrawal successful. New balance: ₹{account.get_balance():.2f}")
+        # ── 4. Perform a valid withdrawal ─────────────────────────────────
+        print("\n[4] Withdrawing ₹1,500...")
+        account.withdraw(1500.0)
+        logger.log(f"Placed withdrawal of ₹1500. New balance: ₹{account.get_balance():.2f}")
+        print(f"    ✓ Withdrawal successful. New balance: ₹{account.get_balance():.2f}")
 
     # ── 5. Display transaction history ────────────────────────────────
-    print("\n[4] Transaction History:")
+    print("\n[5] Transaction History:")
     print_transaction_history(account)
 
     print("\n\n" + "=" * 50)
