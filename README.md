@@ -1,6 +1,6 @@
 # Bank Account Management & Transaction Analysis
 
-> **Status: 🚧 Under Development — DataGrokr PLP Week 2 Mini-Project**
+> **Status: 🚧 In Progress — DataGrokr PLP Week 2 Mini-Project | Phase 2 Complete**
 
 ---
 
@@ -20,40 +20,41 @@ It is built **phase by phase**, with each phase adding new features that corresp
 
 ---
 
-## Planned Features
+## Features
 
-> ⚠️ The features below are **planned / under development**. They are NOT yet implemented.
+### Part A — OOP Bank Account System ✅ Implemented
 
-### Part A — OOP Bank Account System
+- ✅ Account creation (account holder name, account number, initial balance)
+- ✅ Deposit with validation
+- ✅ Withdrawal with validation
+- ✅ Balance management
+- ✅ Transaction history tracking
+- ✅ Exception handling (invalid amounts, insufficient balance)
+- ✅ Unit tests (20 tests passing)
 
-- Account creation (account holder name, account number, initial balance)
-- Deposit and withdrawal operations
-- Balance management with validation
-- Transaction history tracking
-- Exception handling for invalid operations (e.g., overdraft, negative deposit)
+### Part B — Dataset Analysis 🔜 Planned
 
-### Part B — Dataset Analysis
-
-- CSV transaction dataset (generated or imported)
-- Reading and exploring data with **pandas**
-- Filtering transactions by type, date, or amount
-- Aggregation using `groupby()`
-- Summary statistics (total deposits, total withdrawals, net balance)
-- Joining datasets using `merge()`
-- Numerical analysis using **NumPy**
+- 🔜 CSV transaction dataset (generated or imported)
+- 🔜 Reading and exploring data with **pandas**
+- 🔜 Filtering transactions by type, date, or amount
+- 🔜 Aggregation using `groupby()`
+- 🔜 Summary statistics (total deposits, total withdrawals, net balance)
+- 🔜 Joining datasets using `merge()`
+- 🔜 Numerical analysis using **NumPy**
 
 ### Python Concepts Demonstrated
 
-> These concepts will be applied where they naturally fit — not forced artificially.
+> These concepts are applied where they naturally fit — not forced artificially.
 
-- Object-Oriented Programming (Classes, `__init__`, Inheritance, Polymorphism)
-- List comprehensions and dictionary comprehensions
-- `lambda`, `map()`, `filter()`
-- Decorators
-- Context managers
-- Modules and packages
-- Exception handling
-- Clean, readable code
+- ✅ Object-Oriented Programming (Classes, `__init__`, class-level attributes)
+- ✅ Modules and packages (`src/` as a package)
+- ✅ Exception handling (`ValueError` with meaningful messages)
+- ✅ Clean, readable code (PEP 8, docstrings, meaningful names)
+- 🔜 Inheritance and Polymorphism (planned)
+- 🔜 List comprehensions and dictionary comprehensions (planned)
+- 🔜 `lambda`, `map()`, `filter()` (planned)
+- 🔜 Decorators (planned)
+- 🔜 Context managers (planned)
 
 ---
 
@@ -65,25 +66,27 @@ Bank_Account/
 ├── README.md               ← This file
 ├── requirements.txt        ← Project dependencies
 ├── .gitignore              ← Files excluded from Git
+├── run.py                  ← Entry point — run from project root
 │
 ├── src/                    ← All Python source code
 │   ├── __init__.py
 │   │
 │   ├── models/             ← OOP classes and data models
 │   │   ├── __init__.py
-│   │   └── bank_account.py ← BankAccount class (planned)
+│   │   └── bank_account.py ← ✅ BankAccount class (Phase 2)
 │   │
-│   ├── services/           ← Application/business logic
+│   ├── services/           ← Application/business logic (planned)
 │   │   └── __init__.py
 │   │
-│   ├── analysis/           ← pandas/NumPy analysis scripts
+│   ├── analysis/           ← pandas/NumPy analysis (planned)
 │   │   └── __init__.py
 │   │
-│   └── main.py             ← Application entry point (planned)
+│   └── main.py             ← ✅ CLI demo (Phase 2)
 │
-├── data/                   ← CSV transaction datasets
+├── data/                   ← CSV transaction datasets (planned)
 │
-└── tests/                  ← Unit and integration tests (planned)
+└── tests/
+    └── test_bank_account.py ← ✅ 20 unit tests (Phase 2)
 ```
 
 ### Folder Responsibilities
@@ -137,10 +140,89 @@ pip install -r requirements.txt
 | Phase | Description | Status |
 |---|---|---|
 | Phase 1 | Project initialization & structure | ✅ Complete |
-| Phase 2 | BankAccount OOP implementation | 🔜 Planned |
+| Phase 2 | BankAccount OOP implementation | ✅ Complete |
 | Phase 3 | pandas Transaction Analysis | 🔜 Planned |
 | Phase 4 | Advanced features (decorators, context managers) | 🔜 Planned |
 | Phase 5 | Testing & final cleanup | 🔜 Planned |
+
+---
+
+---
+
+## Phase 2 — OOP Bank Account
+
+### BankAccount Class (`src/models/bank_account.py`)
+
+The `BankAccount` class is the core of Part A. Each instance represents one bank account.
+
+#### Attributes
+
+| Attribute | Type | Description |
+|---|---|---|
+| `account_holder` | `str` | Name of the account owner |
+| `account_number` | `str` | Auto-generated unique ID (e.g. `ACC1001`) |
+| `balance` | `float` | Current account balance |
+| `_transactions` | `list` | Private list of all successful transactions |
+
+#### How Account Numbers are Generated
+
+A **class-level counter** `_account_counter` starts at `1000`. Each time a new `BankAccount` is created, the counter increments and the account number is formatted as `f"ACC{counter}"`. This ensures every account in a program session gets a distinct number without needing a database.
+
+#### Methods
+
+| Method | Description |
+|---|---|
+| `__init__(account_holder, initial_balance=0.0)` | Creates a new account, validates initial balance |
+| `deposit(amount)` | Adds funds, validates amount > 0, records transaction |
+| `withdraw(amount)` | Removes funds, validates amount > 0 and ≤ balance |
+| `get_balance()` | Returns current balance (does not print) |
+| `get_transaction_history()` | Returns a **copy** of the transaction list |
+| `display_account()` | Prints account holder, number, and balance |
+
+#### Transaction History
+
+Every successful operation (initial deposit, deposit, withdrawal) is recorded as a dictionary:
+
+```python
+{"type": "deposit", "amount": 2000.0, "balance": 7000.0}
+```
+
+`get_transaction_history()` returns a **copy** of the internal list, so callers cannot accidentally modify the real history.
+
+#### Exception Handling
+
+All validation uses `ValueError` with clear messages:
+
+| Situation | Exception |
+|---|---|
+| Negative initial balance | `ValueError("Initial balance cannot be negative.")` |
+| Deposit ≤ 0 | `ValueError("Deposit amount must be greater than zero.")` |
+| Withdrawal ≤ 0 | `ValueError("Withdrawal amount must be greater than zero.")` |
+| Withdrawal > balance | `ValueError("Insufficient balance.")` |
+
+### Tests (`tests/test_bank_account.py`)
+
+20 unit tests across 4 test classes using Python's built-in `unittest` framework:
+
+- `TestBankAccountCreation` — account creation and account number uniqueness
+- `TestDeposit` — valid deposits, invalid amounts, balance unchanged on error
+- `TestWithdraw` — valid withdrawals, invalid amounts, insufficient balance
+- `TestTransactionHistory` — history growth, copy isolation
+
+**All 20 tests pass.**
+
+### Running the Project
+
+```bash
+# Activate virtual environment (Windows)
+venv\Scripts\activate
+
+# Run the demo
+python run.py
+
+# Run the tests
+python -m unittest tests/test_bank_account.py -v
+```
 
 ---
 
