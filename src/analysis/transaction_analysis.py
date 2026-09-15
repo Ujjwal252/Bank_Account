@@ -105,6 +105,39 @@ def numpy_summary(df: pd.DataFrame) -> dict:
     }
 
 
+def advanced_python_concepts_demo(df: pd.DataFrame) -> dict:
+    """
+    Demonstrates Week 2 concepts: lambda, filter(), map(), and comprehensions.
+    Extracts Data to base structures and manipulates them purely via Python functional methods.
+    """
+    if "Amount" not in df.columns or "AccountHolder" not in df.columns:
+        return {}
+
+    # Extract rows as a list of dicts for Python-native processing
+    records = df[["AccountHolder", "Amount", "TransactionType"]].to_dict(orient="records")
+
+    # 1. filter() and lambda: Get all withdrawals
+    withdrawals_only = list(filter(lambda x: x["TransactionType"] == "Withdrawal", records))
+
+    # 2. map() and lambda: Extract string descriptions of heavy transactions (> 5000)
+    heavy_txns = list(filter(lambda x: x["Amount"] > 5000, records))
+    heavy_descriptions = list(map(lambda x: f"{x['AccountHolder']} moved ₹{x['Amount']}", heavy_txns))
+
+    # 3. List Comprehension: Extract all deposit amounts
+    deposit_amounts = [txn["Amount"] for txn in records if txn["TransactionType"] == "Deposit"]
+
+    # 4. Dictionary Comprehension: Map AccountHolder to their list of transaction amounts
+    # (Note: Using Pandas here first to simplify, then using dict comprehension)
+    grouped_series = df.groupby("AccountHolder")["Amount"].apply(list)
+    holder_to_amounts = {holder: amounts for holder, amounts in grouped_series.items()}
+
+    return {
+        "heavy_transactions": heavy_descriptions,
+        "deposit_amounts_sample": deposit_amounts[:5],  # Just a sample
+        "holders": list(holder_to_amounts.keys())
+    }
+
+
 def analyze_transactions(txn_path: str, acc_path: str) -> dict:
     """
     End-to-end analysis method. 
@@ -131,6 +164,9 @@ def analyze_transactions(txn_path: str, acc_path: str) -> dict:
     # 6. NumPy Basic Analysis
     overall_summary = numpy_summary(txn_df)
     
+    # 7. Advanced Python Concepts (lambda, map, filter, comprehensions)
+    advanced_concepts = advanced_python_concepts_demo(txn_df)
+    
     # Pack up the results
     return {
         "inspection": inspection,
@@ -139,5 +175,6 @@ def analyze_transactions(txn_path: str, acc_path: str) -> dict:
         "total_withdrawals": len(withdrawals_df),
         "overall_summary": overall_summary,
         "account_summary_df": account_summary,
-        "merged_sample_df": merged_df.head(3) # Return top 3 of merge for display
+        "merged_sample_df": merged_df.head(3), # Return top 3 of merge for display
+        "advanced_concepts": advanced_concepts
     }

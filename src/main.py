@@ -9,7 +9,7 @@ Run from project root:
 """
 
 import os
-from src.models.bank_account import BankAccount
+from src.models.bank_account import BankAccount, SavingsAccount
 from src.analysis.transaction_analysis import analyze_transactions
 from src.services.transaction_logger import TransactionLogger
 
@@ -38,8 +38,8 @@ def main() -> None:
     print("=" * 50)
 
     # ── 1. Create a new bank account ──────────────────────────────────
-    print("\n[1] Creating account for Arjun Sharma with ₹5,000 initial balance...")
-    account = BankAccount("Arjun Sharma", 5000.0)
+    print("\n[1] Creating SavingsAccount for Arjun Sharma with ₹5,000 balance and ₹500 minimum...")
+    account = SavingsAccount("Arjun Sharma", initial_balance=5000.0, minimum_balance=500.0)
     account.display_account()
     
     # ── Using the Context Manager to log transactions ─────────────────
@@ -61,8 +61,15 @@ def main() -> None:
         logger.log(f"Placed withdrawal of ₹1500. New balance: ₹{account.get_balance():.2f}")
         print(f"    ✓ Withdrawal successful. New balance: ₹{account.get_balance():.2f}")
 
-    # ── 5. Display transaction history ────────────────────────────────
-    print("\n[5] Transaction History:")
+    # ── 5. Demonstrate Polymorphism (Insufficient minimum balance) ────
+    print("\n[5] Attempting withdrawal of ₹4,000 (breaches minimum balance)...")
+    try:
+        account.withdraw(4000.0)
+    except ValueError as e:
+        print(f"    ✗ Caught ValueError: {e}")
+        
+    # ── 6. Display transaction history ────────────────────────────────
+    print("\n[6] Transaction History:")
     print_transaction_history(account)
 
     print("\n\n" + "=" * 50)
@@ -99,6 +106,12 @@ def main() -> None:
         
         print("\n[Merged Account + Transaction info (pandas merge) - Top 3]")
         print(results['merged_sample_df'].to_string(index=False))
+        
+        print("\n[Advanced Python Concepts Demo (lambda, map, filter, comprehensions)]")
+        adv = results['advanced_concepts']
+        print(f"  Heavy Transactions (>5000): {adv['heavy_transactions']}")
+        print(f"  Sample Deposit Amounts: {adv['deposit_amounts_sample']}")
+        print(f"  Unique Account Holders: {', '.join(adv['holders'])}")
         
     except Exception as e:
         print(f"\n✗ Error during analysis: {e}")

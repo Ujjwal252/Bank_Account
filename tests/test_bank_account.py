@@ -167,5 +167,34 @@ class TestTransactionHistory(unittest.TestCase):
         self.assertEqual(len(acc.get_transaction_history()), 1)
 
 
+class TestSavingsAccount(unittest.TestCase):
+    """Tests for SavingsAccount polymorphism and inheritance."""
+    
+    def test_savings_account_creation(self):
+        """SavingsAccount is correctly instantiated with minimum balance constraints."""
+        from src.models.bank_account import SavingsAccount
+        sa = SavingsAccount("Test user", 1000.0, minimum_balance=200.0)
+        self.assertEqual(sa.minimum_balance, 200.0)
+        self.assertEqual(sa.balance, 1000.0)
+        
+    def test_savings_account_valid_withdrawal(self):
+        """Withdrawal works perfectly provided minimum balance is maintained."""
+        from src.models.bank_account import SavingsAccount
+        sa = SavingsAccount("Test user", 1000.0, minimum_balance=200.0)
+        sa.withdraw(700.0)
+        self.assertEqual(sa.balance, 300.0)
+        
+    def test_savings_account_insufficient_minimum_balance(self):
+        """Polymorphic withdraw() refuses to dip below minimum_balance."""
+        from src.models.bank_account import SavingsAccount
+        sa = SavingsAccount("Test user", 1000.0, minimum_balance=200.0)
+        
+        with self.assertRaises(ValueError) as ctx:
+            sa.withdraw(900.0)
+            
+        self.assertIn("Must maintain minimum balance of ₹200.00", str(ctx.exception))
+        self.assertEqual(sa.balance, 1000.0)
+
+
 if __name__ == "__main__":
     unittest.main()

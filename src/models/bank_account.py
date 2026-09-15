@@ -163,3 +163,42 @@ class BankAccount:
             f"acc={self.account_number}, "
             f"balance=₹{self.balance:.2f})"
         )
+
+
+class SavingsAccount(BankAccount):
+    """
+    Demonstrates Inheritance and Polymorphism.
+    A SavingsAccount is a BankAccount that enforces a minimum balance.
+    """
+    
+    def __init__(self, account_holder: str, initial_balance: float = 0.0, minimum_balance: float = 500.0):
+        # Call parent __init__
+        super().__init__(account_holder, initial_balance)
+        self.minimum_balance = minimum_balance
+        
+    @log_transaction
+    def withdraw(self, amount: float) -> None:
+        """
+        Polymorphic overridden method.
+        Withdraws money but leaves the required minimum balance in the account.
+        """
+        if amount <= 0:
+            raise ValueError(f"Withdrawal amount must be greater than zero. Got: {amount}")
+
+        if (self.balance - amount) < self.minimum_balance:
+            raise ValueError(f"Insufficient balance. Must maintain minimum balance of ₹{self.minimum_balance:.2f}.")
+
+        self.balance -= amount
+        self._transactions.append({
+            "type": "withdrawal",
+            "amount": amount,
+            "balance": self.balance,
+        })
+        
+    def __str__(self) -> str:
+        return (
+            f"SavingsAccount({self.account_holder!r}, "
+            f"acc={self.account_number}, "
+            f"balance=₹{self.balance:.2f}, "
+            f"min=₹{self.minimum_balance:.2f})"
+        )

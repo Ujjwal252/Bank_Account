@@ -1,59 +1,43 @@
 # Bank Account Management & Transaction Analysis
 
-> **Status: 🚧 In Progress — DataGrokr PLP Week 2 Mini-Project | Phase 4 Complete**
+## Project Overview
 
----
+This project is a Python-based **Bank Account Management System** integrated with a **pandas-powered Transaction Dataset Analysis** suite. It was developed to systematically implement and demonstrate the syllabus topics outlined in the **DataGrokr Pre-Learning Program (PLP) Week 2**.
 
-## Project Objective
+## Objective
 
-This project will build a **Python-based Bank Account Management System** combined with a **pandas-powered Transaction Dataset Analysis** tool.
-
-It demonstrates practical, real-world application of intermediate Python concepts taught in **DataGrokr Pre-Learning Program (PLP) Week 2**.
-
----
-
-## DataGrokr PLP Week 2
-
-This project is being developed as the **Week 2 mini-project** of the DataGrokr Pre-Learning Program.
-
-It is built **phase by phase**, with each phase adding new features that correspond to the concepts covered in the weekly syllabus.
-
----
+To build an object-oriented, clean-coded banking simulation (Part A) paired with a functional data analysis pipeline (Part B) that satisfies all DataGrokr Week 2 requirements. The focus is on clean architecture, isolated exception design, and strict test-driven integrity.
 
 ## Features
 
-### Part A — OOP Bank Account System ✅ Implemented
+- **OOP Core:** Bank account creation, constraints, deposits, and validated withdrawals.
+- **Inheritance & Polymorphism:** Specialized account models (e.g., `SavingsAccount`) with strict minimum balance requirements overlapping standard validation.
+- **Advanced Python Subsystems:** Custom logging via decorators (`@log_transaction`), flat-file IO managed securely through context managers (`TransactionLogger`), and functional paradigms (`lambda`, `map`, `filter`, comprehensions) used natively on dataset dictionaries.
+- **pandas/NumPy Analysis:** Data extraction using `pd.read_csv`, dimensional aggregation via `groupby`, statistical volume tracking in `NumPy`, and ledger merging.
+- **Resiliency:** Granular exception handling (never swallowing exceptions arbitrarily) backed by 39 robust unit tests via Python `unittest`.
 
-- ✅ Account creation (account holder name, account number, initial balance)
-- ✅ Deposit with validation
-- ✅ Withdrawal with validation
-- ✅ Balance management
-- ✅ Transaction history tracking
-- ✅ Exception handling (invalid amounts, insufficient balance)
-- ✅ Unit tests (20 tests passing)
+---
 
-### Part B — Dataset Analysis ✅ Implemented
+## Week 2 Concepts Demonstrated
 
-- ✅ CSV transaction dataset (`transactions.csv`) and accounts (`accounts.csv`)
-- ✅ Reading and exploring data with **pandas**
-- ✅ Filtering transactions by type (Deposits vs Withdrawals) or amount
-- ✅ Aggregation using `groupby()` to get transaction count and total amount per account
-- ✅ Summary statistics using NumPy (`sum`, `mean`, `max`, `min`)
-- ✅ Joining datasets using **pandas** `merge()`
-
-### Python Concepts Demonstrated
-
-> These concepts are applied where they naturally fit — not forced artificially.
-
-- ✅ Object-Oriented Programming (Classes, `__init__`, class-level attributes)
-- ✅ Modules and packages (`src/` as a package)
-- ✅ Exception handling (`ValueError` with meaningful messages)
-- ✅ Clean, readable code (PEP 8, docstrings, meaningful names)
-- 🔜 Inheritance and Polymorphism (planned)
-- 🔜 List comprehensions and dictionary comprehensions (planned)
-- 🔜 `lambda`, `map()`, `filter()` (planned)
-- ✅ Decorators (`@log_transaction` on `BankAccount` routines)
-- ✅ Context managers (`TransactionLogger` for automated file closure)
+| Week 2 Concept | Where Demonstrated |
+| :--- | :--- |
+| **Comprehensions** | `transaction_analysis.py`: Extracts specific deposit lists (List); Maps grouped accounts to Series dicts (Dict). |
+| **lambda** | `transaction_analysis.py`: Inline predicates checking transaction keys (`x["TransactionType"] == ...`) and mapping formatter strings. |
+| **map** | `transaction_analysis.py`: Applies string interpolation across a filtered list of large accounts. |
+| **filter** | `transaction_analysis.py`: Sifts `dict` records extracting only "Withdrawal"s or values > 5000 natively. |
+| **OOP** | `bank_account.py`: Classes, attributes, and methods in `BankAccount`. Defines `__init__`, encapsulate state (`_transactions`). |
+| **Inheritance** | `bank_account.py`: `SavingsAccount(BankAccount)` inherits standard logic but introduces a `minimum_balance`. |
+| **Polymorphism** | `bank_account.py`: `SavingsAccount.withdraw()` overwrites parent generic logic enforcing distinct minimum balance rules. |
+| **Decorators** | `decorators.py`: `@log_transaction` adorns class operations tracing function start, argument extraction `*args, **kwargs`, and re-raising of errors securely. Uses `functools.wraps`. |
+| **Context Managers** | `transaction_logger.py`: `TransactionLogger` natively secures append bindings to `.txt` files in `__enter__` and strictly closes streams regardless of exceptions in `__exit__`. |
+| **pandas** | `transaction_analysis.py`: Uses `pd.read_csv` (loads assets), `df.groupby(...).agg(...)` (calculates user dimensions), and `pd.merge` (joins ledger types). |
+| **NumPy** | `transaction_analysis.py`: Harnesses `np.sum()`, `np.mean()`, `np.max()`, and `np.min()` operating strictly over localized `amount` arrays. |
+| **Modules** | General: Imports separated intelligently. Features abstracted loosely (e.g. `main.py` explicitly loads exactly what it orchestrates). |
+| **Packages** | `src/`: Organizes hierarchical folders containing `__init__.py` making imports clean (`src.models.bank_account`, `src.analysis.transaction_analysis`). |
+| **Virtual Environment** | Environmentally walled project. See Installation. Excluded entirely from `git` via `.gitignore`. |
+| **Clean Code** | PEP8 consistency, docstrings, modular isolation of print routines to `main.py` freeing functional bounds to return structures natively. |
+| **Exception Design** | Employs Python native `ValueError` across business boundaries ensuring robust cascading behavior while trapping IO operations effectively (e.g. `FileNotFoundError`). Never swallows. |
 
 ---
 
@@ -61,236 +45,91 @@ It is built **phase by phase**, with each phase adding new features that corresp
 
 ```
 Bank_Account/
-│
-├── README.md               ← This file
-├── requirements.txt        ← Project dependencies
-├── .gitignore              ← Files excluded from Git
-├── run.py                  ← Entry point — run from project root
-│
-├── src/                    ← All Python source code
-│   ├── __init__.py
-│   │
-│   ├── models/             ← OOP classes and data models
+├── .gitignore              ← Excludes runtime logs and venv
+├── README.md               ← Documentation
+├── requirements.txt        ← Locked 3rd party modules (pandas, numpy)
+├── run.py                  ← Root Execution Script
+├── src/                    ← Application Packages
+│   ├── main.py             ← CLI application interface
+│   ├── analysis/           
 │   │   ├── __init__.py
-│   │   └── bank_account.py ← ✅ BankAccount class (Phase 2)
-│   │
-│   ├── services/           
+│   │   └── transaction_analysis.py 
+│   ├── models/             
 │   │   ├── __init__.py
-│   │   ├── decorators.py       ← ✅ @log_transaction (Phase 4)
-│   │   └── transaction_logger.py ← ✅ Context Manager (Phase 4)
-│   │
-│   ├── analysis/           ← pandas/NumPy analysis (planned)
-│   │   └── __init__.py
-│   │
-│   └── main.py             ← ✅ CLI demo (Phase 2)
-│
-├── data/                   ← CSV transaction datasets (planned)
-│
+│   │   └── bank_account.py 
+│   └── services/           
+│       ├── __init__.py
+│       ├── decorators.py   
+│       └── transaction_logger.py 
+├── data/
+│   ├── accounts.csv        ← Account level info records
+│   └── transactions.csv    ← Ledger entries mock dataset (25 rows)
 └── tests/
-    └── test_bank_account.py ← ✅ 20 unit tests (Phase 2)
+    ├── test_bank_account.py
+    ├── test_decorators.py
+    ├── test_transaction_analysis.py
+    └── test_transaction_logger.py
 ```
-
-### Folder Responsibilities
-
-| Folder / File | Responsibility |
-|---|---|
-| `src/models/` | OOP class definitions (BankAccount, SavingsAccount, etc.) |
-| `src/services/` | Business logic — deposit, withdrawal, validation rules |
-| `src/analysis/` | pandas and NumPy-based transaction analysis |
-| `data/` | CSV datasets for analysis |
-| `tests/` | Unit tests for models and services |
-| `src/main.py` | Entry point — orchestrates the application |
 
 ---
 
-## Technologies
+## Installation
 
-| Technology | Purpose |
-|---|---|
-| **Python 3.x** | Core programming language |
-| **pandas** | Data analysis and manipulation |
-| **NumPy** | Numerical computations |
-| **Git** | Version control |
-| **GitHub** | Remote repository and collaboration |
+1. **Clone the generic repository**:
+   ```powershell
+   git clone <repo-url>
+   cd Bank_Account
+   ```
+2. **Setup virtual environment**:
+   ```powershell
+   python -m venv venv
+   venv\Scripts\activate
+   ```
+3. **Install Requirements**:
+   ```powershell
+   python -m pip install -r requirements.txt
+   ```
 
 ---
 
-## Setup Instructions
+## Running the Application
 
-> These instructions will be updated as the project evolves.
-
-```bash
-# 1. Clone the repository
-git clone <repo-url>
-cd Bank_Account
-
-# 2. Create and activate the virtual environment
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# 3. Install dependencies (when requirements.txt is populated)
-pip install -r requirements.txt
+Execute the application orchestration from the project root simply:
+```powershell
+python run.py
 ```
+
+## Running Tests
+
+Verify the underlying systems using the built-in isolated unittests (Total: 39).
+```powershell
+python -m unittest discover -s tests -v
+```
+
+---
+
+## Dataset Description
+
+The `data/` folder comprises two CSV blocks utilized natively by `pandas`:
+- **`transactions.csv`**: Contains a standard logging mock spanning 25 distinct transaction behaviors covering distinct users (`AccountNumber`, `TransactionType`, `Amount`, `Date`, etc).
+- **`accounts.csv`**: Maps individual IDs against generic banking branch rules (`AccountType`, `Branch`) yielding a 5 row index utilized heavily when joining domains.
+
+## Exception Handling
+
+All structural mutations (depositing negative volumes, breaching minimum balances in SavingsAccounts, file absences in CSV loads) instantly raise explicit typed exceptions.
+
+We do NOT use custom exceptions arbitrarily because Python's built-in `ValueError` and `FileNotFoundError` semantically resolve these boundaries securely. The program deliberately propagates exceptions upwards (decorators don't swallow exceptions and context managers natively return `False` on escape sequences) making the software predictable.
 
 ---
 
 ## Development Phases
 
-| Phase | Description | Status |
-|---|---|---|
-| Phase 1 | Project initialization & structure | ✅ Complete |
-| Phase 2 | BankAccount OOP implementation | ✅ Complete |
-| Phase 3 | pandas/NumPy Transaction Analysis | ✅ Complete |
-| Phase 4 | Advanced features (decorators, context managers) | ✅ Complete |
-| Phase 5 | Testing & final cleanup | 🔜 Planned |
+This project was developed incrementally spanning:
+- **Phase 1:** Bootstrapping project architecture & Git rules.
+- **Phase 2:** OOP foundation (`BankAccount`) and exception design.
+- **Phase 3:** Transaction Analytics mapping Pandas and NumPy functionality to a generic UI schema.
+- **Phase 4:** Incorporating intercept hooks natively across context managers and dynamic decorators seamlessly handling IO bindings.
+- **Phase 5:** Formal integration audit satisfying Week 2 PLP prerequisites (Comprehensions, Lambda, Map, Filter, Polymorphism).
 
 ---
-
----
-
-## Phase 2 — OOP Bank Account
-
-### BankAccount Class (`src/models/bank_account.py`)
-
-The `BankAccount` class is the core of Part A. Each instance represents one bank account.
-
-#### Attributes
-
-| Attribute | Type | Description |
-|---|---|---|
-| `account_holder` | `str` | Name of the account owner |
-| `account_number` | `str` | Auto-generated unique ID (e.g. `ACC1001`) |
-| `balance` | `float` | Current account balance |
-| `_transactions` | `list` | Private list of all successful transactions |
-
-#### How Account Numbers are Generated
-
-A **class-level counter** `_account_counter` starts at `1000`. Each time a new `BankAccount` is created, the counter increments and the account number is formatted as `f"ACC{counter}"`. This ensures every account in a program session gets a distinct number without needing a database.
-
-#### Methods
-
-| Method | Description |
-|---|---|
-| `__init__(account_holder, initial_balance=0.0)` | Creates a new account, validates initial balance |
-| `deposit(amount)` | Adds funds, validates amount > 0, records transaction |
-| `withdraw(amount)` | Removes funds, validates amount > 0 and ≤ balance |
-| `get_balance()` | Returns current balance (does not print) |
-| `get_transaction_history()` | Returns a **copy** of the transaction list |
-| `display_account()` | Prints account holder, number, and balance |
-
-#### Transaction History
-
-Every successful operation (initial deposit, deposit, withdrawal) is recorded as a dictionary:
-
-```python
-{"type": "deposit", "amount": 2000.0, "balance": 7000.0}
-```
-
-`get_transaction_history()` returns a **copy** of the internal list, so callers cannot accidentally modify the real history.
-
-#### Exception Handling
-
-All validation uses `ValueError` with clear messages:
-
-| Situation | Exception |
-|---|---|
-| Negative initial balance | `ValueError("Initial balance cannot be negative.")` |
-| Deposit ≤ 0 | `ValueError("Deposit amount must be greater than zero.")` |
-| Withdrawal ≤ 0 | `ValueError("Withdrawal amount must be greater than zero.")` |
-| Withdrawal > balance | `ValueError("Insufficient balance.")` |
-
-### Tests (`tests/test_bank_account.py`)
-
-20 unit tests across 4 test classes using Python's built-in `unittest` framework:
-
-- `TestBankAccountCreation` — account creation and account number uniqueness
-- `TestDeposit` — valid deposits, invalid amounts, balance unchanged on error
-- `TestWithdraw` — valid withdrawals, invalid amounts, insufficient balance
-- `TestTransactionHistory` — history growth, copy isolation
-
-**All 20 tests pass.**
-
-### Running the Project
-
-```bash
-# Activate virtual environment (Windows)
-venv\Scripts\activate
-
-# Run the demo
-python run.py
-
-# Run the tests
-python -m unittest tests/test_bank_account.py -v
-```
-
----
-
----
-
-## Phase 3 — pandas and NumPy Analysis
-
-### Datasets (`data/`)
-
-1. **`transactions.csv`**: A realistic dataset containing 25 transaction rows for 5 different bank accounts across early 2024. Contains Deposits and Withdrawals.
-2. **`accounts.csv`**: Account-level data (`AccountType`, `Branch`) used to demonstrate table joins.
-
-### Analysis Module (`src/analysis/transaction_analysis.py`)
-
-A fully typed module exposing clean functions for data analytics without coupling directly to the CLI interface.
-
-#### pandas Concepts Implemented
-
-| Operation | Function used internaly | Description |
-|---|---|---|
-| Load CSV | `pd.read_csv()` | Loads the local transaction files, catches `FileNotFoundError`. |
-| Inspection | `df.shape`, `df.columns` | Examines the dimensions and headers of the loaded CSV. |
-| Filtering | `df[df[col] == val]` | Extracts subset DataFrames (e.g., Deposits only). |
-| Aggregation | `df.groupby(...).agg(...)`| Groups transactions by `AccountNumber` to compute total volume and transaction count per account. |
-| Merge | `pd.merge(df1, df2, on=...)` | Performs an inner join of transactions with the accounts table, enriching the transaction record with `AccountType` and `Branch`. |
-
-#### NumPy Concepts Implemented
-
-To demonstrate mathematical integration, the module extracts the `Amount` series to a pure NumPy array via `.to_numpy()` and calculates:
-- `np.sum()` — the total volume of money moved
-- `np.mean()` — average transaction size
-- `np.max()` / `np.min()` — transaction extrema
-
-### Updated CLI (`main.py`)
-
-The application entry point `run.py` has been updated to run both phases in sequence:
-1. **Part A:** Demonstrates the core `BankAccount` OOP transactions with output checking.
-2. **Part B:** Automatically points to the `data/` folder, performs the analysis, and displays a summary report to stdout.
-
-### Tests (`tests/test_transaction_analysis.py`)
-
-A full unittest suite covers the analysis module:
-- Validates that CSV loads and raises accurate errors for bad paths.
-- Asserts that filters produce correct data constraints.
-- Verifies that `groupby` correctly computes expected bounds (e.g. `ACC1001` equals expected sum).
-- Validates the dimensions and columns of the output `merge`.
-
----
-
-## Phase 4 — Decorators and Context Managers
-
-### Decorator (`src/services/decorators.py`)
-
-A custom Python decorator `@log_transaction` is implemented to automatically hook into standard `BankAccount` operations without polluting core domain logic with print statements.
-
-- **Why it is used**: Cleanly intercepts method calls like `deposit()` and `withdraw()` to emit logging events prior to execution and after successful resolution. It seamlessly passes arguments (`*args, **kwargs`) forward.
-- **Exceptions**: If the inner function fails (e.g., `ValueError` due to exceeding balance), the decorator catches the error, logs it as a failure, and then carefully **re-raises** it so it is not swallowed.
-- **Metadata**: Utilizes built-in `functools.wraps` ensuring `deposit.__name__` and `deposit.__doc__` are fully preserved.
-
-### Context Manager (`src/services/transaction_logger.py`)
-
-A custom class-based context manager `TransactionLogger` explicitly handles IO-blocks related to journaling transactions.
-
-- **Why it is used**: Automatically manages opening and closing `data/app_transaction_log.txt`. 
-- **`__enter__`**: Provisions requisite directories and securely opens the append-only log file stream.
-- **`__exit__`**: Intercepts block departure (whether normal or due to an exception like `ValueError`) and issues a deterministic `.close()` on the file, preventing resource leaks. Exiting returns `False` properly allowing arbitrary exceptions within `__exit__` to bubble outwards.
-
----
-
-*DataGrokr Pre-Learning Program — Week 2 Mini-Project*
+*Created for DataGrokr Pre-Learning Program — Week 2*

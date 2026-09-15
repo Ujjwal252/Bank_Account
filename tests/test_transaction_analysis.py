@@ -94,5 +94,16 @@ class TestTransactionAnalysis(unittest.TestCase):
         self.assertEqual(summary["max"], np.max(amounts))
 
 
+    def test_advanced_python_concepts_demo(self):
+        """Ensures map, filter, lambda, comprehensions demo runs nicely on real DataFrame."""
+        from src.analysis.transaction_analysis import advanced_python_concepts_demo
+        adv_obj = advanced_python_concepts_demo(self.txn_df)
+        
+        self.assertIn("heavy_transactions", adv_obj)
+        self.assertIn("deposit_amounts_sample", adv_obj)
+        self.assertIn("holders", adv_obj)
+        self.assertGreater(len(adv_obj["holders"]), 0)
+
+
 if __name__ == "__main__":
     unittest.main()
