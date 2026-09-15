@@ -1,6 +1,6 @@
 # Bank Account Management & Transaction Analysis
 
-> **Status: 🚧 In Progress — DataGrokr PLP Week 2 Mini-Project | Phase 2 Complete**
+> **Status: 🚧 In Progress — DataGrokr PLP Week 2 Mini-Project | Phase 3 Complete**
 
 ---
 
@@ -32,15 +32,14 @@ It is built **phase by phase**, with each phase adding new features that corresp
 - ✅ Exception handling (invalid amounts, insufficient balance)
 - ✅ Unit tests (20 tests passing)
 
-### Part B — Dataset Analysis 🔜 Planned
+### Part B — Dataset Analysis ✅ Implemented
 
-- 🔜 CSV transaction dataset (generated or imported)
-- 🔜 Reading and exploring data with **pandas**
-- 🔜 Filtering transactions by type, date, or amount
-- 🔜 Aggregation using `groupby()`
-- 🔜 Summary statistics (total deposits, total withdrawals, net balance)
-- 🔜 Joining datasets using `merge()`
-- 🔜 Numerical analysis using **NumPy**
+- ✅ CSV transaction dataset (`transactions.csv`) and accounts (`accounts.csv`)
+- ✅ Reading and exploring data with **pandas**
+- ✅ Filtering transactions by type (Deposits vs Withdrawals) or amount
+- ✅ Aggregation using `groupby()` to get transaction count and total amount per account
+- ✅ Summary statistics using NumPy (`sum`, `mean`, `max`, `min`)
+- ✅ Joining datasets using **pandas** `merge()`
 
 ### Python Concepts Demonstrated
 
@@ -141,7 +140,7 @@ pip install -r requirements.txt
 |---|---|---|
 | Phase 1 | Project initialization & structure | ✅ Complete |
 | Phase 2 | BankAccount OOP implementation | ✅ Complete |
-| Phase 3 | pandas Transaction Analysis | 🔜 Planned |
+| Phase 3 | pandas/NumPy Transaction Analysis | ✅ Complete |
 | Phase 4 | Advanced features (decorators, context managers) | 🔜 Planned |
 | Phase 5 | Testing & final cleanup | 🔜 Planned |
 
@@ -223,6 +222,52 @@ python run.py
 # Run the tests
 python -m unittest tests/test_bank_account.py -v
 ```
+
+---
+
+---
+
+## Phase 3 — pandas and NumPy Analysis
+
+### Datasets (`data/`)
+
+1. **`transactions.csv`**: A realistic dataset containing 25 transaction rows for 5 different bank accounts across early 2024. Contains Deposits and Withdrawals.
+2. **`accounts.csv`**: Account-level data (`AccountType`, `Branch`) used to demonstrate table joins.
+
+### Analysis Module (`src/analysis/transaction_analysis.py`)
+
+A fully typed module exposing clean functions for data analytics without coupling directly to the CLI interface.
+
+#### pandas Concepts Implemented
+
+| Operation | Function used internaly | Description |
+|---|---|---|
+| Load CSV | `pd.read_csv()` | Loads the local transaction files, catches `FileNotFoundError`. |
+| Inspection | `df.shape`, `df.columns` | Examines the dimensions and headers of the loaded CSV. |
+| Filtering | `df[df[col] == val]` | Extracts subset DataFrames (e.g., Deposits only). |
+| Aggregation | `df.groupby(...).agg(...)`| Groups transactions by `AccountNumber` to compute total volume and transaction count per account. |
+| Merge | `pd.merge(df1, df2, on=...)` | Performs an inner join of transactions with the accounts table, enriching the transaction record with `AccountType` and `Branch`. |
+
+#### NumPy Concepts Implemented
+
+To demonstrate mathematical integration, the module extracts the `Amount` series to a pure NumPy array via `.to_numpy()` and calculates:
+- `np.sum()` — the total volume of money moved
+- `np.mean()` — average transaction size
+- `np.max()` / `np.min()` — transaction extrema
+
+### Updated CLI (`main.py`)
+
+The application entry point `run.py` has been updated to run both phases in sequence:
+1. **Part A:** Demonstrates the core `BankAccount` OOP transactions with output checking.
+2. **Part B:** Automatically points to the `data/` folder, performs the analysis, and displays a summary report to stdout.
+
+### Tests (`tests/test_transaction_analysis.py`)
+
+A full unittest suite covers the analysis module:
+- Validates that CSV loads and raises accurate errors for bad paths.
+- Asserts that filters produce correct data constraints.
+- Verifies that `groupby` correctly computes expected bounds (e.g. `ACC1001` equals expected sum).
+- Validates the dimensions and columns of the output `merge`.
 
 ---
 

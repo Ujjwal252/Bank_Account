@@ -1,14 +1,16 @@
 """
 main.py
 
-CLI demonstration of the BankAccount class.
-DataGrokr PLP Week 2 Mini-Project | Phase 2
+CLI demonstration of the BankAccount class and pandas Analysis.
+DataGrokr PLP Week 2 Mini-Project | Phase 2 & 3
 
 Run from project root:
-    python src/main.py
+    python run.py
 """
 
+import os
 from src.models.bank_account import BankAccount
+from src.analysis.transaction_analysis import analyze_transactions
 
 
 def print_transaction_history(account: BankAccount) -> None:
@@ -31,8 +33,7 @@ def print_transaction_history(account: BankAccount) -> None:
 
 def main() -> None:
     print("=" * 50)
-    print("   Bank Account Management System")
-    print("   DataGrokr PLP — Week 2 Demo")
+    print("   BANK ACCOUNT MANAGEMENT (PART A)")
     print("=" * 50)
 
     # ── 1. Create a new bank account ──────────────────────────────────
@@ -50,29 +51,47 @@ def main() -> None:
     account.withdraw(1500.0)
     print(f"    ✓ Withdrawal successful. New balance: ₹{account.get_balance():.2f}")
 
-    # ── 4. Display updated account info ───────────────────────────────
-    print("\n[4] Updated account details:")
-    account.display_account()
-
     # ── 5. Display transaction history ────────────────────────────────
-    print("\n[5] Transaction History:")
+    print("\n[4] Transaction History:")
     print_transaction_history(account)
 
-    # ── 6. Exception handling — invalid deposit ───────────────────────
-    print("\n[6] Attempting invalid deposit of ₹-500...")
+    print("\n\n" + "=" * 50)
+    print("   TRANSACTION DATA ANALYSIS (PART B)")
+    print("=" * 50)
+    
+    # Define absolute paths dynamically based on current location
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    txn_path = os.path.join(base_dir, "data", "transactions.csv")
+    acc_path = os.path.join(base_dir, "data", "accounts.csv")
+    
     try:
-        account.deposit(-500.0)
-    except ValueError as e:
-        print(f"    ✗ Caught ValueError: {e}")
-
-    # ── 7. Exception handling — insufficient balance ──────────────────
-    print("\n[7] Attempting withdrawal of ₹99,999 (exceeds balance)...")
-    try:
-        account.withdraw(99999.0)
-    except ValueError as e:
-        print(f"    ✗ Caught ValueError: {e}")
-
-    print(f"\n    Balance unchanged: ₹{account.get_balance():.2f}")
+        results = analyze_transactions(txn_path, acc_path)
+        print("\n✓ CSV loaded successfully.")
+        
+        print("\n[Data Inspection]")
+        print(f"  Shape: {results['inspection']['shape']}")
+        print(f"  Columns: {', '.join(results['inspection']['columns'])}")
+        
+        print("\n[Overall Totals (Filtering)]")
+        print(f"  Total transaction rows: {results['total_rows']}")
+        print(f"  Total deposits: {results['total_deposits']}")
+        print(f"  Total withdrawals: {results['total_withdrawals']}")
+        
+        print("\n[NumPy Summary (Amounts)]")
+        summary = results['overall_summary']
+        print(f"  Total amount volume: ₹{summary['total']:.2f}")
+        print(f"  Average transaction: ₹{summary['mean']:.2f}")
+        print(f"  Max transaction:     ₹{summary['max']:.2f}")
+        print(f"  Min transaction:     ₹{summary['min']:.2f}")
+        
+        print("\n[Group By Account (pandas groupby)]")
+        print(results['account_summary_df'].to_string())
+        
+        print("\n[Merged Account + Transaction info (pandas merge) - Top 3]")
+        print(results['merged_sample_df'].to_string(index=False))
+        
+    except Exception as e:
+        print(f"\n✗ Error during analysis: {e}")
 
     print("\n" + "=" * 50)
     print("   Demo complete.")
