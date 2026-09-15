@@ -1,0 +1,9 @@
+# requirements.txt
+#
+# Dependencies will be added as each phase is implemented.
+#
+# Planned (Phase 3+):
+#   pandas
+#   numpy
+#
+# To install when ready: pip install -r requirements.txt
