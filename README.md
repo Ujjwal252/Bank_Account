@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-This project is a Python-based **Bank Account Management System** integrated with a **pandas-powered Transaction Dataset Analysis** suite. It was developed to systematically implement and demonstrate the syllabus topics outlined in the **DataGrokr Pre-Learning Program (PLP) Week 2**.
+This project is a Python-based **Bank Account Management System** integrated with a **pandas-powered Transaction Dataset Analysis** suite. It was developed to systematically implement and demonstrate the syllabus topics outlined in the **DataGrokr Pre-Learning Program **.
 
 ## Objective
 
@@ -14,13 +14,18 @@ To build an object-oriented, clean-coded banking simulation (Part A) paired with
 - **Inheritance & Polymorphism:** Specialized account models (e.g., `SavingsAccount`) with strict minimum balance requirements overlapping standard validation.
 - **Advanced Python Subsystems:** Custom logging via decorators (`@log_transaction`), flat-file IO managed securely through context managers (`TransactionLogger`), and functional paradigms (`lambda`, `map`, `filter`, comprehensions) used natively on dataset dictionaries.
 - **pandas/NumPy Analysis:** Data extraction using `pd.read_csv`, dimensional aggregation via `groupby`, statistical volume tracking in `NumPy`, and ledger merging.
-- **Resiliency:** Granular exception handling (never swallowing exceptions arbitrarily) backed by 39 robust unit tests via Python `unittest`.
+- **Persistence:** Interactive customer records and timestamped transactions are stored in `data/master_customer_report.csv` and restored when the application starts.
+- **Account operations:** Existing customers can be selected by customer ID or account number for deposits, withdrawals, balance checks, history, and account views.
+- **Money safety:** Balances use `Decimal`, reject non-finite values, and enforce age, ID, opening-balance, and savings minimum-balance rules.
+- **Safe storage:** Master CSV updates use atomic replacement, and successful operations are appended to the runtime transaction log.
+- **Live analytics:** The CLI reports customer count, transaction count, deposits, withdrawals, net movement, and combined balance from current customer records.
+- **Resiliency:** Granular exception handling (never swallowing exceptions arbitrarily) backed by the project test suite via Python `unittest`.
 
 ---
 
-## Week 2 Concepts Demonstrated
+## Concepts Demonstrated
 
-| Week 2 Concept | Where Demonstrated |
+
 | :--- | :--- |
 | **Comprehensions** | `transaction_analysis.py`: Extracts specific deposit lists (List); Maps grouped accounts to Series dicts (Dict). |
 | **lambda** | `transaction_analysis.py`: Inline predicates checking transaction keys (`x["TransactionType"] == ...`) and mapping formatter strings. |
@@ -62,8 +67,9 @@ Bank_Account/
 │       ├── decorators.py   
 │       └── transaction_logger.py 
 ├── data/
-│   ├── accounts.csv        ← Account level info records
-│   └── transactions.csv    ← Ledger entries mock dataset (25 rows)
+│   ├── accounts.csv        ← Analytics fixture: account-level records
+│   ├── transactions.csv    ← Analytics fixture: ledger entries (25 rows)
+│   └── master_customer_report.csv ← Runtime customer and transaction records
 └── tests/
     ├── test_bank_account.py
     ├── test_decorators.py
@@ -99,9 +105,11 @@ Execute the application orchestration from the project root simply:
 python run.py
 ```
 
+The application menu accepts either numbered options or operation names. Existing accounts can be opened from `view customers`, and the `analytics` option summarizes live customer data.
+
 ## Running Tests
 
-Verify the underlying systems using the built-in isolated unittests (Total: 39).
+Verify the underlying systems using the built-in isolated unittests.
 ```powershell
 python -m unittest discover -s tests -v
 ```
@@ -110,9 +118,10 @@ python -m unittest discover -s tests -v
 
 ## Dataset Description
 
-The `data/` folder comprises two CSV blocks utilized natively by `pandas`:
-- **`transactions.csv`**: Contains a standard logging mock spanning 25 distinct transaction behaviors covering distinct users (`AccountNumber`, `TransactionType`, `Amount`, `Date`, etc).
-- **`accounts.csv`**: Maps individual IDs against generic banking branch rules (`AccountType`, `Branch`) yielding a 5 row index utilized heavily when joining domains.
+The `data/` folder contains two separate kinds of data:
+- **Analytics fixtures:** `transactions.csv` and `accounts.csv` are the sample datasets used by the pandas/NumPy analysis module and its tests. Keep both files unless the analytics feature and its tests are removed as well.
+- **Runtime data:** `master_customer_report.csv` is the live customer database written by the interactive application. It is loaded on startup and should be backed up before deletion.
+- **Runtime log:** `app_transaction_log.txt` records successful deposits and withdrawals. It is regenerated automatically when the first operation is completed.
 
 ## Exception Handling
 

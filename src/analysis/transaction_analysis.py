@@ -41,7 +41,8 @@ def filter_by_type(df: pd.DataFrame, txn_type: str) -> pd.DataFrame:
     if "TransactionType" not in df.columns:
         raise ValueError("DataFrame missing 'TransactionType' column.")
     
-    return df[df["TransactionType"].str.lower() == txn_type.lower()]
+    transaction_types = df["TransactionType"].astype(str).str.strip().str.lower()
+    return df[transaction_types == txn_type.strip().lower()]
 
 
 def filter_above_amount(df: pd.DataFrame, threshold: float) -> pd.DataFrame:
@@ -66,6 +67,12 @@ def group_by_account(df: pd.DataFrame) -> pd.DataFrame:
         "TransactionID": "count",
         "Amount": "sum"
     }).rename(columns={"TransactionID": "TransactionCount", "Amount": "TotalAmount"})
+
+    signed_amounts = df["Amount"].where(
+        df["TransactionType"].astype(str).str.lower().eq("deposit"),
+        -df["Amount"],
+    )
+    grouped["NetMovement"] = signed_amounts.groupby(df["AccountNumber"]).sum()
     
     return grouped
 
@@ -117,7 +124,7 @@ def advanced_python_concepts_demo(df: pd.DataFrame) -> dict:
     records = df[["AccountHolder", "Amount", "TransactionType"]].to_dict(orient="records")
 
     # 1. filter() and lambda: Get all withdrawals
-    withdrawals_only = list(filter(lambda x: x["TransactionType"] == "Withdrawal", records))
+    withdrawals_only = list(filter(lambda x: str(x["TransactionType"]).lower() == "withdrawal", records))
 
     # 2. map() and lambda: Extract string descriptions of heavy transactions (> 5000)
     heavy_txns = list(filter(lambda x: x["Amount"] > 5000, records))
@@ -133,6 +140,7 @@ def advanced_python_concepts_demo(df: pd.DataFrame) -> dict:
 
     return {
         "heavy_transactions": heavy_descriptions,
+        "withdrawal_count": len(withdrawals_only),
         "deposit_amounts_sample": deposit_amounts[:5],  # Just a sample
         "holders": list(holder_to_amounts.keys())
     }

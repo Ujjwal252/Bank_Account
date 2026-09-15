@@ -5,6 +5,10 @@ BankAccount class — core OOP model for the Bank Account Management System.
 DataGrokr PLP Week 2 Mini-Project | Phase 2 & 4
 """
 
+from copy import deepcopy
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
+
 from src.services.decorators import log_transaction
 
 
@@ -25,44 +29,57 @@ class BankAccount:
     # Class-level counter — increments each time a new account is created.
     _account_counter = 1000
 
-    def __init__(self, account_holder: str, initial_balance: float = 0.0):
+    def __init__(self, account_holder: str, initial_balance: Decimal | float | str = 0.0, customer_id: int = None):
         """
         Initialize a new BankAccount.
 
         Args:
             account_holder (str): Name of the account holder.
             initial_balance (float): Starting balance. Defaults to 0.0.
+            customer_id (int | None): Unique customer identifier.
 
         Raises:
             ValueError: If initial_balance is negative.
         """
+        if not account_holder or not account_holder.strip():
+            raise ValueError("Account holder name cannot be empty.")
+
+        initial_balance = self._to_money(initial_balance, "Initial balance")
         if initial_balance < 0:
             raise ValueError("Initial balance cannot be negative.")
 
-        # Increment the class counter and assign a formatted account number.
         BankAccount._account_counter += 1
         self.account_number: str = f"ACC{BankAccount._account_counter}"
-
         self.account_holder: str = account_holder
-        self.balance: float = initial_balance
-
-        # Transaction history — list of dicts, one per successful transaction.
+        self.customer_id: int | None = customer_id
+        self.balance: Decimal = initial_balance
         self._transactions: list = []
 
-        # Record opening balance as the first entry if non-zero.
         if initial_balance > 0:
             self._transactions.append({
                 "type": "initial deposit",
                 "amount": initial_balance,
                 "balance": self.balance,
+                "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             })
 
     # ------------------------------------------------------------------ #
     # Deposit
     # ------------------------------------------------------------------ #
 
+    @staticmethod
+    def _to_money(amount: Decimal | float | str, field_name: str = "Amount") -> Decimal:
+        try:
+            value = Decimal(str(amount))
+        except (InvalidOperation, ValueError, TypeError):
+            raise ValueError(f"{field_name} must be a valid number.") from None
+
+        if not value.is_finite():
+            raise ValueError(f"{field_name} must be a finite number.")
+        return value.quantize(Decimal("0.01"))
+
     @log_transaction
-    def deposit(self, amount: float) -> None:
+    def deposit(self, amount: Decimal | float | str) -> None:
         """
         Deposit money into the account.
 
@@ -72,6 +89,7 @@ class BankAccount:
         Raises:
             ValueError: If amount is zero or negative.
         """
+        amount = self._to_money(amount, "Deposit amount")
         if amount <= 0:
             raise ValueError(f"Deposit amount must be greater than zero. Got: {amount}")
 
@@ -80,6 +98,7 @@ class BankAccount:
             "type": "deposit",
             "amount": amount,
             "balance": self.balance,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         })
 
     # ------------------------------------------------------------------ #
@@ -87,7 +106,7 @@ class BankAccount:
     # ------------------------------------------------------------------ #
 
     @log_transaction
-    def withdraw(self, amount: float) -> None:
+    def withdraw(self, amount: Decimal | float | str) -> None:
         """
         Withdraw money from the account.
 
@@ -99,6 +118,7 @@ class BankAccount:
             ValueError: If amount is zero or negative.
             ValueError: If amount exceeds the current balance.
         """
+        amount = self._to_money(amount, "Withdrawal amount")
         if amount <= 0:
             raise ValueError(f"Withdrawal amount must be greater than zero. Got: {amount}")
 
@@ -110,6 +130,7 @@ class BankAccount:
             "type": "withdrawal",
             "amount": amount,
             "balance": self.balance,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         })
 
     # ------------------------------------------------------------------ #
@@ -139,7 +160,7 @@ class BankAccount:
         Returns:
             list: List of transaction dicts.
         """
-        return list(self._transactions)
+        return deepcopy(self._transactions)
 
     # ------------------------------------------------------------------ #
     # Display
@@ -171,17 +192,22 @@ class SavingsAccount(BankAccount):
     A SavingsAccount is a BankAccount that enforces a minimum balance.
     """
     
-    def __init__(self, account_holder: str, initial_balance: float = 0.0, minimum_balance: float = 500.0):
-        # Call parent __init__
-        super().__init__(account_holder, initial_balance)
+    def __init__(self, account_holder: str, initial_balance: float = 0.0, minimum_balance: float = 500.0, customer_id: int = None):
+        minimum_balance = self._to_money(minimum_balance, "Minimum balance")
+        if minimum_balance < 0:
+            raise ValueError("Minimum balance cannot be negative.")
+        super().__init__(account_holder, initial_balance, customer_id=customer_id)
+        if self.balance < minimum_balance:
+            raise ValueError("Initial balance cannot be below the minimum balance.")
         self.minimum_balance = minimum_balance
         
     @log_transaction
-    def withdraw(self, amount: float) -> None:
+    def withdraw(self, amount: Decimal | float | str) -> None:
         """
         Polymorphic overridden method.
         Withdraws money but leaves the required minimum balance in the account.
         """
+        amount = self._to_money(amount, "Withdrawal amount")
         if amount <= 0:
             raise ValueError(f"Withdrawal amount must be greater than zero. Got: {amount}")
 
@@ -193,6 +219,7 @@ class SavingsAccount(BankAccount):
             "type": "withdrawal",
             "amount": amount,
             "balance": self.balance,
+            "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         })
         
     def __str__(self) -> str:
